@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Descuentos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            background-image: url(./assets/img/background.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .container {
+            background: #d9db5fb2;
+            border: solid 5px #333333be;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+        .history {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .history h2 {
+            text-align: center;
+            color: #333;
+        }
+        .history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .history li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+        .history button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .edit-btn {
+            background-color: #ffc107;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            button {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            button {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Descuentos</h1>
+        <div class="form-group">
+            <label for="price">Precio Original:</label>
+            <input type="number" id="price" placeholder="Introduce el precio original">
+        </div>
+        <div class="form-group">
+            <label for="discount">Descuento (%):</label>
+            <input type="number" id="discount" placeholder="Introduce el porcentaje de descuento">
+        </div>
+        <button onclick="calculateDiscount()">Calcular</button>
+        <div class="result" id="result"></div>
+        <div class="history">
+            <h2>Historial de Resultados</h2>
+            <ul id="historyList"></ul>
+        </div>
+    </div>
+    <script>
+        function calculateDiscount() {
+            const price = parseFloat(document.getElementById('price').value);
+            const discount = parseFloat(document.getElementById('discount').value);
+
+            if (isNaN(price) || isNaN(discount)) {
+                document.getElementById('result').innerText = 'Por favor, introduce valores válidos.';
+                return;
+            }
+
+            const discountAmount = price * (discount / 100);
+            const finalPrice = price - discountAmount;
+
+            const roundedFinalPrice = finalPrice.toFixed(2);
+
+            document.getElementById('result').innerText = `Precio Final: $${roundedFinalPrice}`;
+
+            saveToHistory(price, discount, roundedFinalPrice);
+        }
+
+        function saveToHistory(price, discount, finalPrice) {
+            const historyList = document.getElementById('historyList');
+            const historyItem = document.createElement('li');
+
+            const itemContent = document.createElement('span');
+            itemContent.innerText = `Precio Original: $${price}, Descuento: ${discount}%, Precio Final: $${finalPrice}`;
+            historyItem.appendChild(itemContent);
+
+            const editButton = document.createElement('button');
+            editButton.innerText = 'Editar';
+            editButton.className = 'edit-btn';
+            editButton.onclick = function() {
+                editHistoryItem(price, discount, finalPrice, historyItem);
+            };
+
+            const deleteButton = document.createElement('button');
+            deleteButton.innerText = 'Eliminar';
+            deleteButton.className = 'delete-btn';
+            deleteButton.onclick = function() {
+                deleteHistoryItem(historyItem);
+            };
+
+            historyItem.appendChild(editButton);
+            historyItem.appendChild(deleteButton);
+            historyList.appendChild(historyItem);
+
+            let history = JSON.parse(localStorage.getItem('discountHistory')) || [];
+            history.push({ price, discount, finalPrice });
+            localStorage.setItem('discountHistory', JSON.stringify(history));
+        }
+
+        function editHistoryItem(price, discount, finalPrice, historyItem) {
+            document.getElementById('price').value = price;
+            document.getElementById('discount').value = discount;
+            historyItem.remove();
+            deleteFromLocalStorage(price, discount, finalPrice);
+        }
+
+        function deleteHistoryItem(historyItem) {
+            const itemText = historyItem.querySelector('span').innerText;
+            const [price, discount, finalPrice] = itemText.match(/\d+(\.\d+)?/g).map(Number);
+
+            historyItem.remove();
+            deleteFromLocalStorage(price, discount, finalPrice);
+        }
+
+        function deleteFromLocalStorage(price, discount, finalPrice) {
+            let history = JSON.parse(localStorage.getItem('discountHistory')) || [];
+            history = history.filter(item => item.price !== price || item.discount !== discount || item.finalPrice !== finalPrice.toFixed(2));
+            localStorage.setItem('discountHistory', JSON.stringify(history));
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('discountHistory')) || [];
+            const historyList = document.getElementById('historyList');
+            history.forEach(item => {
+                const historyItem = document.createElement('li');
+
+                const itemContent = document.createElement('span');
+                itemContent.innerText = `Precio Original: $${item.price}, Descuento: ${item.discount}%, Precio Final: $${item.finalPrice}`;
+                historyItem.appendChild(itemContent);
+
+                const editButton = document.createElement('button');
+                editButton.innerText = 'Editar';
+                editButton.className = 'edit-btn';
+                editButton.onclick = function() {
+                    editHistoryItem(item.price, item.discount, item.finalPrice, historyItem);
+                };
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Eliminar';
+                deleteButton.className = 'delete-btn';
+                deleteButton.onclick = function() {
+                    deleteHistoryItem(historyItem);
+                };
+
+                historyItem.appendChild(editButton);
+                historyItem.appendChild(deleteButton);
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>
