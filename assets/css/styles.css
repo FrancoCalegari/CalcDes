@@ -101,6 +101,11 @@ html {
         padding: 10px;
         background-color: #f8f9fab2;
         border-radius: 15px;
+
+        max-height: 200px; /* Altura máxima para el contenedor de la historia */
+        overflow-y: auto; /* Activar el desplazamiento vertical */
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
     }
     .history h2 {
         text-align: center;
@@ -130,6 +135,21 @@ html {
         font-size: 14px;
         cursor: pointer;
     }
+
+    #historyList {
+        list-style: none;
+        padding: 0;
+    }
+    
+    #historyList li {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+
     .edit-btn {
         background-color: #ffc107;
         color: white;
